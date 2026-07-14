@@ -1,0 +1,431 @@
+L’oeuf 
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Œuf — Minuteur de cuisson</title>
+<style>
+  :root{
+    --bg:#fbfbfd;
+    --surface:#ffffff;
+    --text:#1d1d1f;
+    --subtle:#86868b;
+    --line:rgba(0,0,0,0.08);
+    --accent:#caa472;
+    --accent-soft:#f1e3cd;
+    --danger:#e0533d;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",
+      "Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    flex:0 0 auto;
+    backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    background:rgba(251,251,253,0.78);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1100px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 24px;
+  }
+  .logo{
+    font-size:19px;font-weight:600;letter-spacing:-0.02em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .logo .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--accent);
+    display:inline-block;
+  }
+  .nav-links{display:flex;gap:8px;font-size:13.5px;}
+  .nav-links button{
+    font-family:inherit;color:var(--subtle);background:none;border:none;
+    cursor:pointer;padding:8px 16px;border-radius:980px;font-size:13.5px;
+    transition:color .2s var(--ease), background .2s var(--ease);
+  }
+  .nav-links button:hover{color:var(--text);background:#f0f0f2;}
+  .nav-links button.is-current{color:var(--text);background:#f0f0f2;}
+
+  /* ---------- MAIN LAYOUT (no scroll) ---------- */
+  .app{
+    height:100vh;
+    display:flex;flex-direction:column;
+  }
+  main{
+    flex:1 1 auto;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:8px 24px 18px;
+    min-height:0;
+  }
+
+  .eyebrow{
+    font-size:12px;font-weight:600;color:var(--accent);
+    letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;
+    text-align:center;
+  }
+  h1{
+    font-size:clamp(22px,3.2vw,32px);
+    font-weight:700;letter-spacing:-0.03em;
+    margin:0 0 4px;line-height:1.05;text-align:center;
+  }
+  .sub{
+    font-size:13.5px;color:var(--subtle);font-weight:400;
+    margin:0 auto 18px;max-width:420px;text-align:center;
+  }
+
+  /* ---------- MODE TRIGGER ---------- */
+  .mode-trigger{
+    display:flex;align-items:center;gap:12px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:980px;
+    padding:8px 8px 8px 18px;
+    cursor:pointer;
+    margin-bottom:22px;
+    transition:border-color .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .mode-trigger:hover{border-color:var(--accent);box-shadow:0 6px 18px rgba(202,164,114,0.18);}
+  .mode-trigger .mt-label{font-size:12px;color:var(--subtle);}
+  .mode-trigger .mt-name{font-size:14.5px;font-weight:600;}
+  .mode-trigger .mt-icon{
+    width:32px;height:32px;border-radius:50%;
+    background:var(--accent-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;color:var(--accent);font-weight:700;
+  }
+  .mode-trigger .mt-change{
+    font-size:12.5px;font-weight:600;color:var(--accent);
+    border-left:1px solid var(--line);padding-left:12px;margin-left:2px;
+  }
+
+  /* ---------- TIMER ---------- */
+  .timer-ring-wrap{
+    position:relative;
+    width:min(46vh,260px);height:min(46vh,260px);
+  }
+  svg.ring{width:100%;height:100%;transform:rotate(-90deg);}
+  svg.ring circle{fill:none;stroke-width:6;}
+  .ring-bg{stroke:var(--line);}
+  .ring-fg{
+    stroke:var(--accent);
+    stroke-linecap:round;
+    transition:stroke-dashoffset 1s linear, stroke .3s var(--ease);
+  }
+  .ring-fg.danger{stroke:var(--danger);}
+
+  .timer-center{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .time-display{
+    font-size:clamp(36px,7vw,54px);
+    font-weight:700;letter-spacing:-0.03em;
+    font-variant-numeric:tabular-nums;line-height:1;
+  }
+  .time-label{margin-top:6px;font-size:12.5px;color:var(--subtle);font-weight:500;}
+
+  .controls{
+    display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;
+  }
+  button.ctrl{
+    border:none;border-radius:980px;
+    padding:12px 28px;font-size:14.5px;font-weight:600;
+    cursor:pointer;font-family:inherit;
+    transition:transform .2s var(--ease), background .25s var(--ease), opacity .2s var(--ease);
+  }
+  button.ctrl:active{transform:scale(0.96);}
+  .btn-primary{background:var(--text);color:#fff;}
+  .btn-primary:hover{background:#000;}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--line);}
+  .btn-secondary:hover{background:#f4f4f5;}
+  button.ctrl:disabled{opacity:0.35;cursor:not-allowed;}
+
+  .status-line{
+    margin-top:14px;font-size:13px;color:var(--subtle);min-height:18px;
+  }
+  .status-line.done{color:var(--accent);font-weight:600;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(20,18,16,0.35);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s var(--ease);
+  }
+  .modal-overlay.open{opacity:1;pointer-events:auto;}
+
+  .modal{
+    background:var(--surface);
+    border-radius:28px;
+    max-width:560px;width:100%;
+    padding:30px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.25);
+    transform:translateY(18px) scale(0.97);
+    transition:transform .35s var(--ease);
+  }
+  .modal-overlay.open .modal{transform:translateY(0) scale(1);}
+
+  .modal-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:20px;
+  }
+  .modal-header h2{font-size:19px;font-weight:700;margin:0;letter-spacing:-0.02em;}
+  .modal-close{
+    width:30px;height:30px;border-radius:50%;border:none;
+    background:#f0f0f2;color:var(--subtle);font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s var(--ease), color .2s var(--ease);
+  }
+  .modal-close:hover{background:#e4e4e7;color:var(--text);}
+
+  .mode-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+  }
+  .mode-card{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:18px 16px;
+    cursor:pointer;text-align:left;
+    transition:transform .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
+    position:relative;overflow:hidden;
+  }
+  .mode-card:hover{transform:translateY(-2px);}
+  .mode-card.active{
+    border-color:var(--accent);
+    background:linear-gradient(160deg, var(--accent-soft), var(--bg) 65%);
+  }
+  .mode-name{font-size:15px;font-weight:600;letter-spacing:-0.01em;margin-bottom:3px;}
+  .mode-desc{font-size:12px;color:var(--subtle);line-height:1.4;margin-bottom:12px;min-height:32px;}
+  .mode-time{font-size:21px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+  .mode-time span{font-size:12px;font-weight:500;color:var(--subtle);margin-left:3px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+
+  @media (max-height:680px){
+    h1{font-size:20px;}
+    .sub{margin-bottom:12px;}
+    .mode-trigger{margin-bottom:14px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <nav>
+    <div class="nav-inner">
+      <div class="logo"><span class="dot"></span>L'Œuf</div>
+      <div class="nav-links">
+        <button id="navModes">Modes</button>
+        <button id="navTimer" class="is-current">Minuteur</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="eyebrow">Précision culinaire</div>
+    <h1>La cuisson parfaite</h1>
+    <p class="sub">Choisissez votre œuf, lancez le minuteur, aucune approximation.</p>
+
+    <button class="mode-trigger" id="openModalBtn">
+      <span class="mt-icon" id="mtIcon">●</span>
+      <span>
+        <span class="mt-label">Cuisson sélectionnée</span><br>
+        <span class="mt-name" id="mtName">À la coque</span>
+      </span>
+      <span class="mt-change">Changer</span>
+    </button>
+
+    <div class="timer-ring-wrap">
+      <svg class="ring" viewBox="0 0 200 200">
+        <circle class="ring-bg" cx="100" cy="100" r="92"></circle>
+        <circle class="ring-fg" id="ringFg" cx="100" cy="100" r="92"
+          stroke-dasharray="578" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="timer-center">
+        <div class="time-display" id="timeDisplay">04:00</div>
+        <div class="time-label" id="timeLabel">À la coque</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl btn-primary" id="startBtn">Démarrer</button>
+      <button class="ctrl btn-secondary" id="resetBtn">Réinitialiser</button>
+    </div>
+
+    <div class="status-line" id="statusLine"></div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Choisissez la cuisson</h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="mode-grid" id="modeGrid"></div>
+  </div>
+</div>
+
+<script>
+  const modes = [
+    { id:'mollet-doux', name:'Mollet', desc:'Blanc pris, jaune coulant', time:360 },
+    { id:'coque', name:'À la coque', desc:'Blanc juste pris, jaune liquide', time:240 },
+    { id:'mollet', name:'Mi-cuit', desc:'Jaune crémeux, presque pris', time:420 },
+    { id:'dur', name:'Dur', desc:'Cuisson complète', time:600 },
+  ];
+
+  let currentMode = modes[1];
+  let remaining = currentMode.time;
+  let total = currentMode.time;
+  let interval = null;
+  let running = false;
+
+  const modeGrid = document.getElementById('modeGrid');
+  const timeDisplay = document.getElementById('timeDisplay');
+  const timeLabel = document.getElementById('timeLabel');
+  const ringFg = document.getElementById('ringFg');
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const statusLine = document.getElementById('statusLine');
+  const mtName = document.getElementById('mtName');
+  const openModalBtn = document.getElementById('openModalBtn');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalClose = document.getElementById('modalClose');
+  const navModes = document.getElementById('navModes');
+  const navTimer = document.getElementById('navTimer');
+
+  const CIRC = 2 * Math.PI * 92;
+  ringFg.setAttribute('stroke-dasharray', CIRC);
+
+  function renderModes(){
+    modeGrid.innerHTML = '';
+    modes.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'mode-card' + (m.id === currentMode.id ? ' active' : '');
+      const mins = Math.floor(m.time/60);
+      const secs = m.time % 60;
+      card.innerHTML = `
+        <div class="mode-name">${m.name}</div>
+        <div class="mode-desc">${m.desc}</div>
+        <div class="mode-time">${mins}<span>min${secs ? ' '+secs+'s' : ''}</span></div>
+      `;
+      card.addEventListener('click', () => selectMode(m));
+      modeGrid.appendChild(card);
+    });
+  }
+
+  function selectMode(m){
+    if(running) stopTimer();
+    currentMode = m;
+    remaining = m.time;
+    total = m.time;
+    statusLine.textContent = '';
+    statusLine.classList.remove('done');
+    updateDisplay();
+    renderModes();
+    mtName.textContent = m.name;
+    closeModal();
+  }
+
+  function formatTime(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const sec = (s%60).toString().padStart(2,'0');
+    return `${m}:${sec}`;
+  }
+
+  function updateDisplay(){
+    timeDisplay.textContent = formatTime(remaining);
+    timeLabel.textContent = currentMode.name;
+    const progress = 1 - (remaining/total);
+    ringFg.style.strokeDashoffset = CIRC * (1 - progress);
+    ringFg.classList.toggle('danger', remaining <= 10 && remaining > 0);
+  }
+
+  function startTimer(){
+    if(running) return;
+    running = true;
+    startBtn.textContent = 'En cuisson…';
+    startBtn.disabled = true;
+    statusLine.textContent = '';
+    statusLine.classList.remove('done');
+
+    interval = setInterval(() => {
+      remaining--;
+      updateDisplay();
+      if(remaining <= 0){
+        clearInterval(interval);
+        running = false;
+        startBtn.textContent = 'Démarrer';
+        startBtn.disabled = false;
+        statusLine.textContent = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+        statusLine.classList.add('done');
+      }
+    }, 1000);
+  }
+
+  function stopTimer(){
+    clearInterval(interval);
+    running = false;
+    startBtn.textContent = 'Démarrer';
+    startBtn.disabled = false;
+  }
+
+  function resetTimer(){
+    stopTimer();
+    remaining = currentMode.time;
+    total = currentMode.time;
+    statusLine.textContent = '';
+    statusLine.classList.remove('done');
+    updateDisplay();
+  }
+
+  function openModal(){
+    renderModes();
+    modalOverlay.classList.add('open');
+  }
+  function closeModal(){
+    modalOverlay.classList.remove('open');
+  }
+
+  startBtn.addEventListener('click', startTimer);
+  resetBtn.addEventListener('click', resetTimer);
+  openModalBtn.addEventListener('click', openModal);
+  navModes.addEventListener('click', openModal);
+  navTimer.addEventListener('click', closeModal);
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if(e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeModal();
+  });
+
+  renderModes();
+  updateDisplay();
+  mtName.textContent = currentMode.name;
+</script>
+
+</body>
+</html>
