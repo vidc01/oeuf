@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>L'œuf — Minuteur de cuisson</title>
+
+  <!-- PWA / iPhone : permet d'installer l'app sur l'écran d'accueil -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#fbfbfd" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="L'œuf" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="icon" href="icon-192.png" />
+
+  <style>
+    :root{
+      --bg:#fbfbfd;
+      --surface:#ffffff;
+      --text:#1d1d1f;
+      --subtle:#86868b;
+      --line:rgba(0,0,0,0.08);
+      --accent:#caa472;
+      --accent-soft:#f1e3cd;
+      --danger:#e0533d;
+      --ease:cubic-bezier(.16,1,.3,1);
+      --shadow:0 18px 50px rgba(0,0,0,.12);
+    }
+
+    * { box-sizing:border-box; }
+
+    html, body {
+      margin:0;
+      padding:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Helvetica,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+
+    body {
+      min-height:100svh;
+    }
+
+    button {
+      font:inherit;
+    }
+
+    .app {
+      min-height:100svh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    nav {
+      flex:0 0 auto;
+      backdrop-filter:saturate(180%) blur(20px);
+      -webkit-backdrop-filter:saturate(180%) blur(20px);
+      background:rgba(251,251,253,.78);
+      border-bottom:1px solid var(--line);
+    }
+
+    .nav-inner {
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 24px;
+    }
+
+    .logo {
+      font-size:19px;
+      font-weight:600;
+      letter-spacing:-.02em;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+
+    .logo .dot {
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--accent);
+      display:inline-block;
+      flex:0 0 auto;
+    }
+
+    .nav-links {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .nav-links button {
+      color:var(--subtle);
+      background:none;
+      border:none;
+      cursor:pointer;
+      padding:8px 16px;
+      border-radius:980px;
+      font-size:13.5px;
+      transition:color .2s var(--ease), background .2s var(--ease);
+    }
+
+    .nav-links button:hover,
+    .nav-links button.is-current {
+      color:var(--text);
+      background:#f0f0f2;
+    }
+
+    main {
+      flex:1 1 auto;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:24px 20px 28px;
+      min-height:0;
+      gap:16px;
+    }
+
+    .eyebrow {
+      font-size:12px;
+      font-weight:600;
+      color:var(--accent);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+      text-align:center;
+    }
+
+    h1 {
+      font-size:clamp(24px,3.2vw,34px);
+      font-weight:700;
+      letter-spacing:-.03em;
+      margin:0 0 6px;
+      line-height:1.05;
+      text-align:center;
+    }
+
+    .sub {
+      font-size:13.5px;
+      color:var(--subtle);
+      font-weight:400;
+      margin:0 auto 18px;
+      max-width:420px;
+      text-align:center;
+    }
+
+    .mode-trigger {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:980px;
+      padding:8px 8px 8px 18px;
+      cursor:pointer;
+      margin-bottom:22px;
+      transition:border-color .25s var(--ease), box-shadow .25s var(--ease), transform .2s var(--ease);
+      box-shadow:0 4px 20px rgba(0,0,0,.04);
+      max-width:100%;
+    }
+
+    .mode-trigger:hover {
+      border-color:var(--accent);
+      box-shadow:0 6px 18px rgba(202,164,114,.18);
+      transform:translateY(-1px);
+    }
+
+    .mode-trigger .mt-label {
+      font-size:12px;
+      color:var(--subtle);
+    }
+
+    .mode-trigger .mt-name {
+      font-size:14.5px;
+      font-weight:600;
+      color:var(--text);
+    }
+
+    .mode-trigger .mt-icon {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      background:var(--accent-soft);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+      color:var(--accent);
+      font-weight:700;
+      flex:0 0 auto;
+    }
+
+    .mode-trigger .mt-change {
+      font-size:12.5px;
+      font-weight:600;
+      color:var(--accent);
+      border-left:1px solid var(--line);
+      padding-left:12px;
+      margin-left:2px;
+      white-space:nowrap;
+    }
+
+    .timer-ring-wrap {
+      position:relative;
+      width:min(46vh,260px);
+      height:min(46vh,260px);
+      max-width:100%;
+    }
+
+    svg.ring {
+      width:100%;
+      height:100%;
+      transform:rotate(-90deg);
+      display:block;
+    }
+
+    .ring circle {
+      fill:none;
+      stroke-width:6;
+    }
+
+    .ring-bg {
+      stroke:var(--line);
+    }
+
+    .ring-fg {
+      stroke:var(--accent);
+      stroke-linecap:round;
+      transition:stroke-dashoffset 1s linear, stroke .3s var(--ease);
+    }
+
+    .ring-fg.danger {
+      stroke:var(--danger);
+    }
+
+    .timer-center {
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      text-align:center;
+    }
+
+    .time-display {
+      font-size:clamp(38px,7vw,54px);
+      font-weight:700;
+      letter-spacing:-.03em;
+      font-variant-numeric:tabular-nums;
+      line-height:1;
+    }
+
+    .time-label {
+      margin-top:6px;
+      font-size:12.5px;
+      color:var(--subtle);
+      font-weight:500;
+    }
+
+    .controls {
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-top:18px;
+      flex-wrap:wrap;
+      width:100%;
+    }
+
+    button.ctrl {
+      border:none;
+      border-radius:980px;
+      padding:12px 28px;
+      font-size:14.5px;
+      font-weight:600;
+      cursor:pointer;
+      font-family:inherit;
+      transition:transform .2s var(--ease), background .25s var(--ease), opacity .2s var(--ease);
+      min-width:140px;
+    }
+
+    button.ctrl:active {
+      transform:scale(.97);
+    }
+
+    .btn-primary {
+      background:var(--text);
+      color:#fff;
+    }
+
+    .btn-primary:hover {
+      background:#000;
+    }
+
+    .btn-secondary {
+      background:var(--surface);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-secondary:hover {
+      background:#f4f4f5;
+    }
+
+    button.ctrl:disabled {
+      opacity:.35;
+      cursor:not-allowed;
+    }
+
+    .status-line {
+      margin-top:14px;
+      font-size:13px;
+      color:var(--subtle);
+      min-height:18px;
+      text-align:center;
+      padding:0 12px;
+    }
+
+    .status-line.done {
+      color:var(--accent);
+      font-weight:600;
+    }
+
+    .alert-banner {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:center;
+      margin-top:10px;
+      font-size:12.5px;
+      color:var(--subtle);
+      text-align:center;
+      flex-wrap:wrap;
+      padding:0 12px;
+    }
+
+    .alert-banner button {
+      border:1px solid var(--line);
+      background:var(--surface);
+      color:var(--accent);
+      font-weight:600;
+      font-size:12.5px;
+      padding:7px 16px;
+      border-radius:980px;
+      cursor:pointer;
+      transition:background .2s var(--ease), transform .2s var(--ease);
+    }
+
+    .alert-banner button:hover {
+      background:var(--accent-soft);
+    }
+
+    .alert-banner button:active {
+      transform:scale(.96);
+    }
+
+    .alert-banner.ok {
+      color:var(--accent);
+    }
+
+    .app-footer {
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      padding:16px 20px 22px;
+      font-size:11.5px;
+      color:var(--accent);
+      opacity:.7;
+      letter-spacing:.01em;
+      text-align:center;
+    }
+
+    .app-footer .dot {
+      width:5px;
+      height:5px;
+      border-radius:50%;
+      background:var(--accent);
+      display:inline-block;
+      flex:0 0 auto;
+    }
+
+    .modal-overlay {
+      position:fixed;
+      inset:0;
+      z-index:100;
+      background:rgba(20,18,16,.35);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .3s var(--ease);
+    }
+
+    .modal-overlay.open {
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .modal {
+      background:var(--surface);
+      border-radius:28px;
+      width:min(100%, 720px);
+      padding:26px;
+      box-shadow:var(--shadow);
+      transform:translateY(18px) scale(.97);
+      transition:transform .35s var(--ease);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .modal-overlay.open .modal {
+      transform:translateY(0) scale(1);
+    }
+
+    .modal-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      flex:0 0 auto;
+    }
+
+    .modal-header h2 {
+      font-size:19px;
+      font-weight:700;
+      margin:0;
+      letter-spacing:-.02em;
+    }
+
+    .modal-close {
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      border:none;
+      background:#f0f0f2;
+      color:var(--subtle);
+      font-size:16px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:background .2s var(--ease), color .2s var(--ease);
+      flex:0 0 auto;
+    }
+
+    .modal-close:hover {
+      background:#e4e4e7;
+      color:var(--text);
+    }
+
+    .modal-body {
+      display:flex;
+      justify-content:center;
+    }
+
+    .mode-grid {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      grid-template-rows:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      width:100%;
+      max-width:620px;
+      align-items:stretch;
+    }
+
+    .mode-card {
+      background:var(--bg);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 16px;
+      cursor:pointer;
+      text-align:left;
+      transition:transform .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+      position:relative;
+      overflow:hidden;
+      min-height:132px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      width:100%;
+    }
+
+    .mode-card:hover {
+      transform:translateY(-2px);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+    }
+
+    .mode-card.active {
+      border-color:var(--accent);
+      background:linear-gradient(160deg, var(--accent-soft), var(--bg) 65%);
+    }
+
+    .mode-name {
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:-.01em;
+      margin-bottom:3px;
+    }
+
+    .mode-desc {
+      font-size:12px;
+      color:var(--subtle);
+      line-height:1.4;
+      margin-bottom:12px;
+      min-height:32px;
+      flex:1;
+    }
+
+    .mode-time {
+      font-size:21px;
+      font-weight:700;
+      letter-spacing:-.02em;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .mode-time span {
+      font-size:12px;
+      font-weight:500;
+      color:var(--subtle);
+      margin-left:3px;
+    }
+
+    .science-page {
+      display:none;
+      flex:1 1 auto;
+      padding:28px 20px 40px;
+      min-height:0;
+    }
+
+    .science-page.active {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .science-wrap {
+      width:100%;
+      max-width:720px;
+    }
+
+    .science-intro {
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:20px 22px;
+      margin-bottom:22px;
+      box-shadow:0 4px 20px rgba(0,0,0,.04);
+    }
+
+    .science-intro p {
+      margin:0;
+      font-size:14px;
+      line-height:1.6;
+      color:var(--text);
+    }
+
+    .science-intro p + p {
+      margin-top:10px;
+    }
+
+    .science-list {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .science-card {
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px 20px;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      transition:border-color .3s var(--ease), box-shadow .3s var(--ease);
+    }
+
+    .science-card:hover {
+      border-color:var(--accent);
+      box-shadow:0 10px 24px rgba(0,0,0,.05);
+    }
+
+    .science-num {
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-weight:700;
+      font-size:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+    }
+
+    .science-content {
+      flex:1 1 auto;
+      min-width:0;
+    }
+
+    .science-card-title {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:6px;
+      flex-wrap:wrap;
+    }
+
+    .science-card-title h3 {
+      margin:0;
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:-.01em;
+    }
+
+    .science-time {
+      font-size:12.5px;
+      font-weight:600;
+      color:var(--accent);
+      white-space:nowrap;
+    }
+
+    .science-body p {
+      margin:0 0 8px;
+      font-size:13px;
+      line-height:1.55;
+      color:var(--text);
+    }
+
+    .science-tip {
+      font-size:12.5px;
+      color:var(--subtle);
+      margin:0;
+    }
+
+    .science-tip strong {
+      color:var(--text);
+      font-weight:600;
+    }
+
+    @media (max-width: 640px) {
+      .nav-inner {
+        padding:12px 16px;
+      }
+
+      .logo {
+        font-size:17px;
+      }
+
+      .nav-links {
+        gap:6px;
+      }
+
+      .nav-links button {
+        padding:8px 12px;
+      }
+
+      main {
+        padding:18px 16px 22px;
+      }
+
+      .mode-trigger {
+        width:100%;
+        max-width:420px;
+        justify-content:space-between;
+      }
+
+      .timer-ring-wrap {
+        width:min(72vw,240px);
+        height:min(72vw,240px);
+      }
+
+      .controls {
+        width:100%;
+      }
+
+      .controls .ctrl {
+        flex:1 1 140px;
+      }
+
+      .modal {
+        border-radius:22px;
+        padding:20px;
+      }
+
+      .science-page {
+        padding:20px 16px 30px;
+      }
+
+      .science-card {
+        padding:16px;
+        gap:12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .mode-trigger .mt-change {
+        display:none;
+      }
+
+      h1 {
+        font-size:22px;
+      }
+
+      .sub {
+        font-size:13px;
+      }
+    }
+
+    @media (max-height: 680px) {
+      h1 {
+        font-size:20px;
+      }
+
+      .sub {
+        margin-bottom:12px;
+      }
+
+      .mode-trigger {
+        margin-bottom:14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <nav>
+      <div class="nav-inner">
+        <div class="logo"><span class="dot"></span>L’œuf</div>
+        <div class="nav-links">
+          <button id="navModes">Modes</button>
+          <button id="navTimer" class="is-current">Minuteur</button>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <div class="eyebrow"> </div>
+      <h1>La cuisson parfaite</h1>
+      <p class="sub">Choisissez votre œuf, lancez le minuteur, et gardez un affichage clair du temps restant.</p>
+
+      <button class="mode-trigger" id="openModalBtn">
+        <span class="mt-icon" id="mtIcon">◌</span>
+        <span>
+          <span class="mt-label">Cuisson sélectionnée</span><br />
+          <span class="mt-name" id="mtName">À la coque</span>
+        </span>
+        <span class="mt-change">Changer</span>
+      </button>
+
+      <div class="timer-ring-wrap">
+        <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="ring-bg" cx="100" cy="100" r="92"></circle>
+          <circle class="ring-fg" id="ringFg" cx="100" cy="100" r="92"></circle>
+        </svg>
+        <div class="timer-center">
+          <div class="time-display" id="timeDisplay">04:00</div>
+          <div class="time-label" id="timeLabel">À la coque</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl btn-primary" id="startBtn">Démarrer</button>
+        <button class="ctrl btn-secondary" id="pauseBtn" disabled>Pause</button>
+        <button class="ctrl btn-secondary" id="resetBtn">Réinitialiser</button>
+      </div>
+
+      <div class="status-line" id="statusLine"></div>
+
+      <div class="alert-banner" id="alertBanner">
+        <span id="alertBannerText">Activez le son et les notifications pour ne pas manquer la fin de cuisson.</span>
+        <button type="button" id="enableAlertsBtn">Activer les alertes</button>
+      </div>
+    </main>
+
+    <section class="science-page" id="sciencePage">
+      <div class="science-wrap">
+        <div class="eyebrow">Comprendre</div>
+        <h1>La science de l’œuf</h1>
+        <p class="sub">Pourquoi quelques minutes de plus ou de moins changent tout.</p>
+
+        <div class="science-intro">
+          <p>Le blanc commence à coaguler autour de 62 °C, tandis que le jaune s'épaissit progressivement entre 65 et 70 °C. Plongé dans l’eau frémissante, l’œuf chauffe progressivement de l’extérieur vers le cœur : le blanc prend donc toujours en premier, puis le jaune, de plus en plus loin de la coquille, jusqu’à son centre.</p>
+          <p>C’est cet écart de température, combiné au temps passé dans l’eau, qui définit la texture finale. Voici les quatre cuissons, de la plus courte à la plus longue.</p>
+        </div>
+
+        <div class="science-list" id="scienceList"></div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <span class="dot"></span>Fait avec précision, à la seconde près.
+    </footer>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle">Choisissez la cuisson</h2>
+        <button class="modal-close" id="modalClose" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="mode-grid" id="modeGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modes = [
+      {
+        id: "coque",
+        name: "À la coque",
+        desc: "Blanc juste pris, jaune liquide.",
+        time: 240,
+        science: "En 4 minutes, seule une fine couche de blanc au contact de la coquille a dépassé 62 °C et coagulé ; le cœur du blanc reste tendre. La chaleur n’a pas eu le temps d’atteindre le jaune, qui demeure entièrement liquide.",
+        tip: "Se déguste dans sa coquille, à la petite cuillère, avec des mouillettes."
+      },
+      {
+        id: "mollet-doux",
+        name: "Mollet doux",
+        desc: "Blanc pris, jaune très coulant.",
+        time: 360,
+        science: "À 6 minutes, le blanc a coagulé jusqu’au centre. La chaleur commence tout juste à atteindre la périphérie du jaune, qui épaissit légèrement en surface tout en restant très coulant au cœur.",
+        tip: "Parfait écalé sur une salade tiède ou une tartine, pour un jaune qui s’écoule."
+      },
+      {
+        id: "mollet",
+        name: "Mi-cuit",
+        desc: "Jaune crémeux, blanc bien tenu.",
+        time: 420,
+        science: "Une minute de plus suffit à faire progresser la chaleur plus profondément dans le jaune : une bonne partie de sa masse dépasse 65 °C et prend une texture crémeuse, presque pâteuse, sans devenir sèche.",
+        tip: "Idéal sur un bol de riz, un ramen, ou coupé en deux sur des légumes rôtis."
+      },
+      {
+        id: "dur",
+        name: "Dur",
+        desc: "Cuisson complète, texture ferme.",
+        time: 600,
+        science: "Après 10 minutes, le jaune a dépassé 70 °C sur toute son épaisseur : la coagulation est complète et homogène, donnant une texture ferme et friable, du bord jusqu’au centre.",
+        tip: "Le choix classique pour les œufs mimosa, les salades composées et les sandwichs."
+      }
+    ].sort((a, b) => a.time - b.time);
+
+    let currentMode = modes[0];
+    let remaining = currentMode.time;
+    let total = currentMode.time;
+    let interval = null;
+    let running = false;
+    let paused = false;
+
+    const modeGrid = document.getElementById("modeGrid");
+    const timeDisplay = document.getElementById("timeDisplay");
+    const timeLabel = document.getElementById("timeLabel");
+    const ringFg = document.getElementById("ringFg");
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const statusLine = document.getElementById("statusLine");
+    const mtName = document.getElementById("mtName");
+    const openModalBtn = document.getElementById("openModalBtn");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalClose = document.getElementById("modalClose");
+    const navModes = document.getElementById("navModes");
+    const navTimer = document.getElementById("navTimer");
+    const mainView = document.querySelector(".app > main");
+    const sciencePage = document.getElementById("sciencePage");
+    const scienceList = document.getElementById("scienceList");
+    const alertBanner = document.getElementById("alertBanner");
+    const alertBannerText = document.getElementById("alertBannerText");
+    const enableAlertsBtn = document.getElementById("enableAlertsBtn");
+    const CIRC = 2 * Math.PI * 92;
+
+    ringFg.setAttribute("stroke-dasharray", CIRC);
+
+    // ---------- Alertes de fin de minuteur (son, vibration, notification) ----------
+    let audioCtx = null;
+    let alertsPrimed = false; // le contexte audio a été débloqué par un geste utilisateur
+
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Sonnerie synthétisée (aucun fichier audio externe requis)
+    function playAlarm() {
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+      const startAt = ctx.currentTime + 0.03;
+      const ringTimes = [0, 0.55, 1.1, 1.65, 2.2];
+
+      ringTimes.forEach((offset) => {
+        const t = startAt + offset;
+        [880, 1108.73].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(t + i * 0.05);
+          osc.stop(t + 0.5);
+        });
+      });
+    }
+
+    function vibrateDevice() {
+      // Note : l'API de vibration n'est pas prise en charge par Safari/iOS,
+      // elle fonctionnera surtout sur Android. On l'appelle sans risque ailleurs.
+      if ("vibrate" in navigator) {
+        navigator.vibrate([300, 150, 300, 150, 300]);
+      }
+    }
+
+    function notifyDone() {
+      if (!("Notification" in window)) return;
+      if (Notification.permission !== "granted") return;
+      try {
+        const reg = navigator.serviceWorker && navigator.serviceWorker.controller
+          ? navigator.serviceWorker
+          : null;
+        const body = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+        if (reg && reg.ready) {
+          reg.ready.then((r) => r.showNotification("Minuteur terminé", { body, icon: "icon-192.png" }));
+        } else {
+          new Notification("Minuteur terminé", { body, icon: "icon-192.png" });
+        }
+      } catch (e) {
+        // Certains contextes (ex. Safari sans PWA installée) refusent silencieusement.
+      }
+    }
+
+    function fireEndAlerts() {
+      playAlarm();
+      vibrateDevice();
+      notifyDone();
+    }
+
+    function updateAlertBanner() {
+      const hasNotif = "Notification" in window;
+      const granted = hasNotif && Notification.permission === "granted";
+
+      if (alertsPrimed && (granted || !hasNotif)) {
+        alertBanner.classList.add("ok");
+        alertBannerText.textContent = "Alertes activées : son, vibration (si disponible) et notification.";
+        enableAlertsBtn.style.display = "none";
+      } else if (hasNotif && Notification.permission === "denied") {
+        alertBanner.classList.remove("ok");
+        alertBannerText.textContent = "Notifications bloquées. Le son sonnera quand même si l'app est ouverte.";
+        enableAlertsBtn.style.display = "none";
+      } else {
+        alertBanner.classList.remove("ok");
+        alertBannerText.textContent = "Activez le son et les notifications pour ne pas manquer la fin de cuisson.";
+        enableAlertsBtn.style.display = "";
+      }
+    }
+
+    enableAlertsBtn.addEventListener("click", () => {
+      // Doit être déclenché par un geste utilisateur pour débloquer l'audio sur iOS.
+      ensureAudioContext();
+      alertsPrimed = true;
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().then(updateAlertBanner);
+      } else {
+        updateAlertBanner();
+      }
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+
+    function formatTime(s) {
+      const m = Math.floor(s / 60).toString().padStart(2, "0");
+      const sec = (s % 60).toString().padStart(2, "0");
+      return `${m}:${sec}`;
+    }
+
+    function renderModes() {
+      modeGrid.innerHTML = "";
+      modes.forEach(m => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "mode-card" + (m.id === currentMode.id ? " active" : "");
+        card.innerHTML = `
+          <div>
+            <div class="mode-name">${m.name}</div>
+            <div class="mode-desc">${m.desc}</div>
+          </div>
+          <div class="mode-time">${Math.floor(m.time / 60)}<span>min</span> ${m.time % 60 ? `${m.time % 60}<span>s</span>` : ""}</div>
+        `;
+        card.addEventListener("click", () => selectMode(m));
+        modeGrid.appendChild(card);
+      });
+    }
+
+    function updateDisplay() {
+      timeDisplay.textContent = formatTime(remaining);
+      timeLabel.textContent = currentMode.name;
+      const progress = 1 - remaining / total;
+      ringFg.style.strokeDashoffset = CIRC * (1 - progress);
+      ringFg.classList.toggle("danger", remaining <= 10);
+    }
+
+    function renderScience() {
+      scienceList.innerHTML = "";
+      modes.forEach((m, i) => {
+        const card = document.createElement("div");
+        card.className = "science-card";
+        card.innerHTML = `
+          <div class="science-num">${i + 1}</div>
+          <div class="science-content">
+            <div class="science-card-title">
+              <h3>${m.name}</h3>
+              <span class="science-time">${Math.floor(m.time / 60)} min${m.time % 60 ? ` ${m.time % 60} s` : ""}</span>
+            </div>
+            <div class="science-body">
+              <p>${m.science}</p>
+              <p class="science-tip"><strong>À table :</strong> ${m.tip}</p>
+            </div>
+          </div>
+        `;
+        scienceList.appendChild(card);
+      });
+    }
+
+    function showScience() {
+      renderScience();
+      mainView.style.display = "none";
+      sciencePage.classList.add("active");
+      navModes.classList.add("is-current");
+      navTimer.classList.remove("is-current");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showTimer() {
+      sciencePage.classList.remove("active");
+      mainView.style.display = "";
+      navTimer.classList.add("is-current");
+      navModes.classList.remove("is-current");
+    }
+
+    function openModal() {
+      renderModes();
+      modalOverlay.classList.add("open");
+      modalOverlay.setAttribute("aria-hidden", "false");
+      modalClose.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove("open");
+      modalOverlay.setAttribute("aria-hidden", "true");
+      openModalBtn.focus();
+    }
+
+    function selectMode(m) {
+      clearInterval(interval);
+      interval = null;
+      running = false;
+      paused = false;
+      currentMode = m;
+      remaining = m.time;
+      total = m.time;
+      statusLine.textContent = `Mode sélectionné : ${m.name}`;
+      statusLine.classList.remove("done");
+      mtName.textContent = m.name;
+      startBtn.textContent = "Démarrer";
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      updateDisplay();
+      renderModes();
+      closeModal();
+    }
+
+    function startTimer() {
+      if (remaining <= 0) return;
+      if (running) return;
+
+      ensureAudioContext();
+      paused = false;
+      running = true;
+      startBtn.textContent = "En cuisson";
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      statusLine.textContent = `Cuisson en cours : ${currentMode.name}`;
+      statusLine.classList.remove("done");
+
+      interval = setInterval(() => {
+        remaining -= 1;
+        updateDisplay();
+
+        if (remaining <= 0) {
+          clearInterval(interval);
+          interval = null;
+          running = false;
+          paused = false;
+          startBtn.textContent = "Démarrer";
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          statusLine.textContent = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+          statusLine.classList.add("done");
+          remaining = 0;
+          updateDisplay();
+          fireEndAlerts();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (!running) return;
+      clearInterval(interval);
+      interval = null;
+      running = false;
+      paused = true;
+      startBtn.textContent = "Reprendre";
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      statusLine.textContent = "Minuteur en pause.";
+      statusLine.classList.remove("done");
+    }
+
+    function resetTimer() {
+      clearInterval(interval);
+      interval = null;
+      running = false;
+      paused = false;
+      remaining = currentMode.time;
+      total = currentMode.time;
+      statusLine.textContent = "";
+      statusLine.classList.remove("done");
+      startBtn.textContent = "Démarrer";
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      updateDisplay();
+    }
+
+    startBtn.addEventListener("click", startTimer);
+    pauseBtn.addEventListener("click", pauseTimer);
+    resetBtn.addEventListener("click", resetTimer);
+    openModalBtn.addEventListener("click", openModal);
+    navModes.addEventListener("click", showScience);
+    navTimer.addEventListener("click", showTimer);
+    modalClose.addEventListener("click", closeModal);
+    modalOverlay.addEventListener("click", e => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
+    });
+
+    renderModes();
+    updateDisplay();
+    mtName.textContent = currentMode.name;
+    pauseBtn.disabled = true;
+    updateAlertBanner();
+  </script>
+</body>
+</html>
