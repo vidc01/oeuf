@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+<<<<<<< HEAD
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>L'œuf — Minuteur de cuisson</title>
 
@@ -14,6 +15,10 @@
   <link rel="apple-touch-icon" href="icon-180.png" />
   <link rel="icon" href="icon-192.png" />
 
+=======
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L'œuf — Minuteur de cuisson</title>
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
   <style>
     :root{
       --bg:#fbfbfd;
@@ -333,6 +338,7 @@
       font-weight:600;
     }
 
+<<<<<<< HEAD
     .alert-banner {
       display:flex;
       align-items:center;
@@ -370,6 +376,8 @@
       color:var(--accent);
     }
 
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
     .app-footer {
       flex:0 0 auto;
       display:flex;
@@ -796,11 +804,14 @@
       </div>
 
       <div class="status-line" id="statusLine"></div>
+<<<<<<< HEAD
 
       <div class="alert-banner" id="alertBanner">
         <span id="alertBannerText">Activez le son et les notifications pour ne pas manquer la fin de cuisson.</span>
         <button type="button" id="enableAlertsBtn">Activer les alertes</button>
       </div>
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
     </main>
 
     <section class="science-page" id="sciencePage">
@@ -895,13 +906,17 @@
     const mainView = document.querySelector(".app > main");
     const sciencePage = document.getElementById("sciencePage");
     const scienceList = document.getElementById("scienceList");
+<<<<<<< HEAD
     const alertBanner = document.getElementById("alertBanner");
     const alertBannerText = document.getElementById("alertBannerText");
     const enableAlertsBtn = document.getElementById("enableAlertsBtn");
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
     const CIRC = 2 * Math.PI * 92;
 
     ringFg.setAttribute("stroke-dasharray", CIRC);
 
+<<<<<<< HEAD
     // ---------- Alertes de fin de minuteur (son, vibration, notification) ----------
     let audioCtx = null;
     let alertsPrimed = false; // le contexte audio a été débloqué par un geste utilisateur
@@ -1009,6 +1024,8 @@
       });
     }
 
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
     function formatTime(s) {
       const m = Math.floor(s / 60).toString().padStart(2, "0");
       const sec = (s % 60).toString().padStart(2, "0");
@@ -1115,7 +1132,10 @@
       if (remaining <= 0) return;
       if (running) return;
 
+<<<<<<< HEAD
       ensureAudioContext();
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
       paused = false;
       running = true;
       startBtn.textContent = "En cuisson";
@@ -1140,7 +1160,10 @@
           statusLine.classList.add("done");
           remaining = 0;
           updateDisplay();
+<<<<<<< HEAD
           fireEndAlerts();
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
         }
       }, 1000);
     }
@@ -1192,7 +1215,10 @@
     updateDisplay();
     mtName.textContent = currentMode.name;
     pauseBtn.disabled = true;
+<<<<<<< HEAD
     updateAlertBanner();
+=======
+>>>>>>> 0de8e8761bcf239f7b801c14bda6c144a03ceb90
   </script>
 </body>
 </html>
