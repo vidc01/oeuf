@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -369,6 +371,31 @@
 
     .alert-banner.ok {
       color:var(--accent);
+    }
+
+    .tick-toggle {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      justify-content:center;
+      margin-top:10px;
+      font-size:12.5px;
+      color:var(--subtle);
+    }
+
+    .tick-toggle label {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .tick-toggle input {
+      accent-color:var(--accent);
+      width:15px;
+      height:15px;
+      cursor:pointer;
     }
 
     .app-footer {
@@ -799,6 +826,10 @@
 
       <div class="status-line" id="statusLine"></div>
 
+      <div class="tick-toggle">
+        <label><input type="checkbox" id="tickToggle" checked /> Tic-tac des secondes</label>
+      </div>
+
       <div class="alert-banner" id="alertBanner">
         <span id="alertBannerText">Activez le son et les notifications pour ne pas manquer la fin de cuisson.</span>
         <button type="button" id="enableAlertsBtn">Activer les alertes</button>
@@ -836,6 +867,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Piste audio silencieuse, jouée en boucle pendant la cuisson pour garder
+       une session média active (contrôles écran verrouillé / Bluetooth). -->
+  <audio id="keepAliveAudio" loop preload="auto"
+    src="data:audio/wav;base64,UklGRmQfAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAfAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="></audio>
 
   <script>
     const modes = [
@@ -880,6 +916,15 @@
     let running = false;
     let paused = false;
 
+    // ---------- Horodatage : le minuteur se recale toujours sur l'heure réelle ----------
+    // Au lieu de compter "remaining -= 1" à chaque tick (ce qui dérive ou se fige
+    // dès que l'onglet/l'app passe en arrière-plan), on calcule le temps restant
+    // à partir d'une date de fin absolue (endTime). Ainsi, même si le navigateur
+    // met les timers en pause pendant que le téléphone est verrouillé, dès que la
+    // page se réveille (retour au premier plan), le temps affiché — et l'alerte
+    // de fin — se corrigent immédiatement au lieu de rester bloqués.
+    let endTime = null; // timestamp (ms) auquel le minuteur doit sonner
+
     const modeGrid = document.getElementById("modeGrid");
     const timeDisplay = document.getElementById("timeDisplay");
     const timeLabel = document.getElementById("timeLabel");
@@ -900,6 +945,8 @@
     const alertBanner = document.getElementById("alertBanner");
     const alertBannerText = document.getElementById("alertBannerText");
     const enableAlertsBtn = document.getElementById("enableAlertsBtn");
+    const tickToggle = document.getElementById("tickToggle");
+    const keepAliveAudio = document.getElementById("keepAliveAudio");
     const CIRC = 2 * Math.PI * 92;
 
     ringFg.setAttribute("stroke-dasharray", CIRC);
@@ -941,6 +988,24 @@
           osc.stop(t + 0.5);
         });
       });
+    }
+
+    // Petit "tic" sec et discret, joué à chaque seconde pendant la cuisson.
+    function playTick() {
+      if (!tickToggle.checked) return;
+      const ctx = ensureAudioContext();
+      if (!ctx || !alertsPrimed) return; // pas de son tant que l'audio n'est pas débloqué
+      const t = ctx.currentTime + 0.01;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(1500, t);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.05, t + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.05);
     }
 
     function vibrateDevice() {
@@ -1041,6 +1106,55 @@
       const progress = 1 - remaining / total;
       ringFg.style.strokeDashoffset = CIRC * (1 - progress);
       ringFg.classList.toggle("danger", remaining <= 10);
+      updateMediaSession();
+    }
+
+    // ---------- Media Session : affiche le minuteur sur l'écran verrouillé ----------
+    // La Media Session API permet à une "app web" de poser des contrôles
+    // (lecture/pause) et un titre sur l'écran verrouillé / centre de contrôle,
+    // comme le ferait une app de musique. C'est le seul mécanisme web qui
+    // s'affiche réellement hors de l'app, sur mobile.
+    //
+    // IMPORTANT — limite honnête : le texte affiché ne se met à jour QUE
+    // pendant que la page est active et exécute du JavaScript. Dès que le
+    // téléphone est verrouillé, iOS et Android suspendent le JavaScript de la
+    // page ; le titre affiché sur l'écran verrouillé reste donc figé sur la
+    // dernière valeur connue jusqu'à ce que vous rouvriez l'app. Ce n'est pas
+    // un vrai "widget" qui continue de décompter tout seul — ça, seule une
+    // app native (ou un minuteur système de l'iPhone/Android) peut le faire.
+    function updateMediaSession() {
+      if (!("mediaSession" in navigator)) return;
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `${formatTime(remaining)} restant`,
+          artist: currentMode.name,
+          album: "L’œuf — Minuteur"
+        });
+        navigator.mediaSession.playbackState = running ? "playing" : (paused ? "paused" : "none");
+      } catch (e) {
+        // Certains navigateurs refusent MediaMetadata hors contexte utilisateur ; on ignore.
+      }
+    }
+
+    function setupMediaSessionHandlers() {
+      if (!("mediaSession" in navigator)) return;
+      try {
+        navigator.mediaSession.setActionHandler("play", startTimer);
+        navigator.mediaSession.setActionHandler("pause", pauseTimer);
+        navigator.mediaSession.setActionHandler("stop", resetTimer);
+      } catch (e) {}
+    }
+
+    function startKeepAliveAudio() {
+      // Lance une piste silencieuse en boucle : sur Android en particulier,
+      // cela évite que le système ne coupe la session média (et donc les
+      // contrôles sur écran verrouillé) dès que l'app passe en arrière-plan.
+      keepAliveAudio.currentTime = 0;
+      keepAliveAudio.play().catch(() => {});
+    }
+
+    function stopKeepAliveAudio() {
+      keepAliveAudio.pause();
     }
 
     function renderScience() {
@@ -1099,6 +1213,8 @@
       interval = null;
       running = false;
       paused = false;
+      endTime = null;
+      stopKeepAliveAudio();
       currentMode = m;
       remaining = m.time;
       total = m.time;
@@ -1113,6 +1229,38 @@
       closeModal();
     }
 
+    // Un seul "tick" toutes les 250 ms : on ne fait pas confiance au compteur
+    // d'appels de setInterval (il peut être retardé), on recalcule toujours
+    // le temps restant à partir de endTime et de l'heure actuelle.
+    function tick() {
+      if (!running || endTime === null) return;
+      const previousRemaining = remaining;
+      const msLeft = endTime - Date.now();
+      remaining = Math.max(0, Math.round(msLeft / 1000));
+
+      if (remaining !== previousRemaining) {
+        updateDisplay();
+        if (remaining > 0) playTick();
+      }
+
+      if (msLeft <= 0) {
+        clearInterval(interval);
+        interval = null;
+        running = false;
+        paused = false;
+        endTime = null;
+        startBtn.textContent = "Démarrer";
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        statusLine.textContent = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+        statusLine.classList.add("done");
+        remaining = 0;
+        updateDisplay();
+        stopKeepAliveAudio();
+        fireEndAlerts();
+      }
+    }
+
     function startTimer() {
       if (remaining <= 0) return;
       if (running) return;
@@ -1120,31 +1268,21 @@
       ensureAudioContext();
       paused = false;
       running = true;
+      endTime = Date.now() + remaining * 1000;
       startBtn.textContent = "En cuisson";
       startBtn.disabled = true;
       pauseBtn.disabled = false;
       statusLine.textContent = `Cuisson en cours : ${currentMode.name}`;
       statusLine.classList.remove("done");
 
-      interval = setInterval(() => {
-        remaining -= 1;
-        updateDisplay();
+      setupMediaSessionHandlers();
+      updateMediaSession();
+      startKeepAliveAudio();
 
-        if (remaining <= 0) {
-          clearInterval(interval);
-          interval = null;
-          running = false;
-          paused = false;
-          startBtn.textContent = "Démarrer";
-          startBtn.disabled = false;
-          pauseBtn.disabled = true;
-          statusLine.textContent = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
-          statusLine.classList.add("done");
-          remaining = 0;
-          updateDisplay();
-          fireEndAlerts();
-        }
-      }, 1000);
+      clearInterval(interval);
+      // 250 ms plutôt que 1000 ms : la page se resynchronise plus vite
+      // dès qu'elle redevient active, au lieu d'attendre jusqu'à 1 s de plus.
+      interval = setInterval(tick, 250);
     }
 
     function pauseTimer() {
@@ -1153,11 +1291,14 @@
       interval = null;
       running = false;
       paused = true;
+      endTime = null;
       startBtn.textContent = "Reprendre";
       startBtn.disabled = false;
       pauseBtn.disabled = true;
       statusLine.textContent = "Minuteur en pause.";
       statusLine.classList.remove("done");
+      updateMediaSession();
+      stopKeepAliveAudio();
     }
 
     function resetTimer() {
@@ -1165,6 +1306,7 @@
       interval = null;
       running = false;
       paused = false;
+      endTime = null;
       remaining = currentMode.time;
       total = currentMode.time;
       statusLine.textContent = "";
@@ -1173,7 +1315,26 @@
       startBtn.disabled = false;
       pauseBtn.disabled = true;
       updateDisplay();
+      stopKeepAliveAudio();
     }
+
+    // ---------- Recalage au retour au premier plan ----------
+    // Dès que l'onglet/l'app redevient visible (l'utilisateur déverrouille son
+    // téléphone ou revient sur l'app), on force un recalcul immédiat plutôt que
+    // d'attendre le prochain setInterval — c'est ce qui corrige le "minuteur
+    // arrêté" que vous décriviez : l'affichage (et l'alerte si le temps est
+    // écoulé) se met à jour dès la réouverture.
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && running) {
+        tick();
+      }
+    });
+    window.addEventListener("focus", () => {
+      if (running) tick();
+    });
+    window.addEventListener("pageshow", () => {
+      if (running) tick();
+    });
 
     startBtn.addEventListener("click", startTimer);
     pauseBtn.addEventListener("click", pauseTimer);
