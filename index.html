@@ -1514,7 +1514,13 @@
 
     alertsToggle.addEventListener("change", () => {
       setAlertsEnabled(alertsToggle.checked);
-      updateAlertBanner();
+      // Réactiver l'option depuis les réglages est un geste utilisateur : le
+      // navigateur peut donc afficher sa demande d'autorisation à ce moment-là.
+      if (alertsToggle.checked && "Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().then(updateAlertBanner);
+      } else {
+        updateAlertBanner();
+      }
     });
 
     if ("serviceWorker" in navigator) {
