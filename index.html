@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -29,6 +27,30 @@
       --danger:#e0533d;
       --ease:cubic-bezier(.16,1,.3,1);
       --shadow:0 18px 50px rgba(0,0,0,.12);
+      --overlay:rgba(20,18,16,.35);
+      --nav-bg:rgba(251,251,253,.78);
+      --chip-bg:#f0f0f2;
+      --chip-bg-hover:#e4e4e7;
+      --primary-bg:#1d1d1f;
+      --primary-fg:#ffffff;
+    }
+
+    html[data-theme="dark"]{
+      --bg:#1c1c1e;
+      --surface:#2c2c2e;
+      --text:#f5f5f7;
+      --subtle:#98989d;
+      --line:rgba(255,255,255,0.1);
+      --accent:#d8b587;
+      --accent-soft:rgba(216,181,135,0.16);
+      --danger:#ff6f5b;
+      --shadow:0 18px 50px rgba(0,0,0,.45);
+      --overlay:rgba(0,0,0,.55);
+      --nav-bg:rgba(28,28,30,.78);
+      --chip-bg:rgba(255,255,255,.08);
+      --chip-bg-hover:rgba(255,255,255,.14);
+      --primary-bg:#f5f5f7;
+      --primary-fg:#1c1c1e;
     }
 
     * { box-sizing:border-box; }
@@ -42,6 +64,7 @@
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Helvetica,Arial,sans-serif;
       -webkit-font-smoothing:antialiased;
       overflow-x:hidden;
+      transition:background .3s var(--ease), color .3s var(--ease);
     }
 
     body {
@@ -62,7 +85,7 @@
       flex:0 0 auto;
       backdrop-filter:saturate(180%) blur(20px);
       -webkit-backdrop-filter:saturate(180%) blur(20px);
-      background:rgba(251,251,253,.78);
+      background:var(--nav-bg);
       border-bottom:1px solid var(--line);
     }
 
@@ -116,7 +139,22 @@
     .nav-links button:hover,
     .nav-links button.is-current {
       color:var(--text);
-      background:#f0f0f2;
+      background:var(--chip-bg);
+    }
+
+    .nav-icon-btn {
+      width:34px;
+      height:34px;
+      padding:0 !important;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+    }
+
+    .nav-icon-btn svg {
+      width:18px;
+      height:18px;
     }
 
     main {
@@ -299,12 +337,12 @@
     }
 
     .btn-primary {
-      background:var(--text);
-      color:#fff;
+      background:var(--primary-bg);
+      color:var(--primary-fg);
     }
 
     .btn-primary:hover {
-      background:#000;
+      filter:brightness(.88);
     }
 
     .btn-secondary {
@@ -314,7 +352,7 @@
     }
 
     .btn-secondary:hover {
-      background:#f4f4f5;
+      background:var(--chip-bg);
     }
 
     button.ctrl:disabled {
@@ -336,66 +374,157 @@
       font-weight:600;
     }
 
-    .alert-banner {
+    .settings-body {
       display:flex;
-      align-items:center;
-      gap:10px;
-      justify-content:center;
-      margin-top:10px;
-      font-size:12.5px;
-      color:var(--subtle);
-      text-align:center;
-      flex-wrap:wrap;
-      padding:0 12px;
+      flex-direction:column;
+      gap:20px;
+      width:100%;
+      max-width:480px;
     }
 
-    .alert-banner button {
+    .settings-section {
+      background:var(--bg);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px 18px;
+    }
+
+    .settings-section h3 {
+      margin:0 0 12px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:var(--subtle);
+    }
+
+    .settings-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .settings-row + .settings-row {
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+    }
+
+    .settings-row-label {
+      font-size:14px;
+      font-weight:600;
+      color:var(--text);
+    }
+
+    .settings-row-desc {
+      font-size:12px;
+      color:var(--subtle);
+      margin-top:2px;
+    }
+
+    .theme-switch {
+      display:flex;
+      gap:6px;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:980px;
+      padding:3px;
+    }
+
+    .theme-switch button {
+      border:none;
+      background:none;
+      color:var(--subtle);
+      font-size:12.5px;
+      font-weight:600;
+      padding:7px 14px;
+      border-radius:980px;
+      cursor:pointer;
+      transition:background .2s var(--ease), color .2s var(--ease);
+      white-space:nowrap;
+    }
+
+    .theme-switch button.active {
+      background:var(--text);
+      color:var(--bg);
+    }
+
+    .switch {
+      position:relative;
+      display:inline-block;
+      width:42px;
+      height:25px;
+      flex:0 0 auto;
+    }
+
+    .switch input {
+      opacity:0;
+      width:0;
+      height:0;
+    }
+
+    .switch-track {
+      position:absolute;
+      cursor:pointer;
+      inset:0;
+      background:var(--line);
+      border-radius:999px;
+      transition:background .25s var(--ease);
+    }
+
+    .switch-track::before {
+      content:"";
+      position:absolute;
+      width:19px;
+      height:19px;
+      left:3px;
+      top:3px;
+      background:#fff;
+      border-radius:50%;
+      transition:transform .25s var(--ease);
+      box-shadow:0 1px 3px rgba(0,0,0,.25);
+    }
+
+    .switch input:checked + .switch-track {
+      background:var(--accent);
+    }
+
+    .switch input:checked + .switch-track::before {
+      transform:translateX(17px);
+    }
+
+    .alert-status {
+      font-size:12.5px;
+      color:var(--subtle);
+      line-height:1.5;
+      margin:0 0 12px;
+    }
+
+    .alert-status.ok {
+      color:var(--accent);
+      font-weight:600;
+    }
+
+    .settings-btn {
+      width:100%;
       border:1px solid var(--line);
       background:var(--surface);
       color:var(--accent);
       font-weight:600;
-      font-size:12.5px;
-      padding:7px 16px;
+      font-size:13.5px;
+      padding:10px 16px;
       border-radius:980px;
       cursor:pointer;
       transition:background .2s var(--ease), transform .2s var(--ease);
     }
 
-    .alert-banner button:hover {
+    .settings-btn:hover {
       background:var(--accent-soft);
     }
 
-    .alert-banner button:active {
-      transform:scale(.96);
-    }
-
-    .alert-banner.ok {
-      color:var(--accent);
-    }
-
-    .tick-toggle {
-      display:flex;
-      align-items:center;
-      gap:8px;
-      justify-content:center;
-      margin-top:10px;
-      font-size:12.5px;
-      color:var(--subtle);
-    }
-
-    .tick-toggle label {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .tick-toggle input {
-      accent-color:var(--accent);
-      width:15px;
-      height:15px;
-      cursor:pointer;
+    .settings-btn:active {
+      transform:scale(.98);
     }
 
     .app-footer {
@@ -425,7 +554,7 @@
       position:fixed;
       inset:0;
       z-index:100;
-      background:rgba(20,18,16,.35);
+      background:var(--overlay);
       backdrop-filter:blur(6px);
       -webkit-backdrop-filter:blur(6px);
       display:flex;
@@ -479,7 +608,7 @@
       height:30px;
       border-radius:50%;
       border:none;
-      background:#f0f0f2;
+      background:var(--chip-bg);
       color:var(--subtle);
       font-size:16px;
       cursor:pointer;
@@ -491,7 +620,7 @@
     }
 
     .modal-close:hover {
-      background:#e4e4e7;
+      background:var(--chip-bg-hover);
       color:var(--text);
     }
 
@@ -687,6 +816,77 @@
       font-weight:600;
     }
 
+    .recipe-btn {
+      margin-top:12px;
+      border:1px solid var(--line);
+      background:var(--surface);
+      color:var(--accent);
+      font-weight:600;
+      font-size:12.5px;
+      padding:8px 16px;
+      border-radius:980px;
+      cursor:pointer;
+      transition:background .2s var(--ease), transform .2s var(--ease);
+    }
+
+    .recipe-btn:hover {
+      background:var(--accent-soft);
+    }
+
+    .recipe-btn:active {
+      transform:scale(.97);
+    }
+
+    .recipe-intro {
+      font-size:13.5px;
+      line-height:1.55;
+      color:var(--text);
+      margin:0 0 16px;
+    }
+
+    .recipe-steps {
+      margin:0 0 20px;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .recipe-steps li {
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      font-size:13.5px;
+      line-height:1.5;
+      color:var(--text);
+    }
+
+    .recipe-steps li::before {
+      content:counter(step);
+      counter-increment:step;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+      margin-top:1px;
+    }
+
+    .recipe-steps {
+      counter-reset:step;
+    }
+
+    #recipeStartBtn {
+      width:100%;
+    }
+
     @media (max-width: 640px) {
       .nav-inner {
         padding:12px 16px;
@@ -789,6 +989,12 @@
         <div class="nav-links">
           <button id="navModes">Modes</button>
           <button id="navTimer" class="is-current">Minuteur</button>
+          <button id="navSettings" class="nav-icon-btn" aria-label="Réglages">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
@@ -825,15 +1031,6 @@
       </div>
 
       <div class="status-line" id="statusLine"></div>
-
-      <div class="tick-toggle">
-        <label><input type="checkbox" id="tickToggle" checked /> Tic-tac des secondes</label>
-      </div>
-
-      <div class="alert-banner" id="alertBanner">
-        <span id="alertBannerText">Activez le son et les notifications pour ne pas manquer la fin de cuisson.</span>
-        <button type="button" id="enableAlertsBtn">Activer les alertes</button>
-      </div>
     </main>
 
     <section class="science-page" id="sciencePage">
@@ -868,6 +1065,65 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="settingsOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-header">
+        <h2 id="settingsTitle">Réglages</h2>
+        <button class="modal-close" id="settingsClose" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-body">
+          <div class="settings-section">
+            <h3>Apparence</h3>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Thème</div>
+                <div class="settings-row-desc">Clair, sombre, ou basé sur les réglages du téléphone.</div>
+              </div>
+              <div class="theme-switch" id="themeSwitch">
+                <button type="button" data-theme-choice="light">Clair</button>
+                <button type="button" data-theme-choice="dark">Sombre</button>
+                <button type="button" data-theme-choice="system">Auto</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Alertes de fin de cuisson</h3>
+            <p class="alert-status" id="alertBannerText">Activez le son et les notifications pour ne pas manquer la fin de cuisson.</p>
+            <button type="button" class="settings-btn" id="enableAlertsBtn">Activer les alertes</button>
+          </div>
+
+          <div class="settings-section">
+            <h3>Pendant la cuisson</h3>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Tic-tac des secondes</div>
+                <div class="settings-row-desc">Un petit son à chaque seconde qui passe.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="tickToggle" checked />
+                <span class="switch-track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="recipeOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="recipeTitle">
+      <div class="modal-header">
+        <h2 id="recipeTitle">Recette</h2>
+        <button class="modal-close" id="recipeClose" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="recipeBody" style="width:100%; max-width:480px;"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Piste audio silencieuse, jouée en boucle pendant la cuisson pour garder
        une session média active (contrôles écran verrouillé / Bluetooth). -->
   <audio id="keepAliveAudio" loop preload="auto"
@@ -881,7 +1137,16 @@
         desc: "Blanc juste pris, jaune liquide.",
         time: 240,
         science: "En 4 minutes, seule une fine couche de blanc au contact de la coquille a dépassé 62 °C et coagulé ; le cœur du blanc reste tendre. La chaleur n’a pas eu le temps d’atteindre le jaune, qui demeure entièrement liquide.",
-        tip: "Se déguste dans sa coquille, à la petite cuillère, avec des mouillettes."
+        tip: "Se déguste dans sa coquille, à la petite cuillère, avec des mouillettes.",
+        recipe: {
+          intro: "La méthode classique des bistrots français : l'œuf plonge dans l'eau déjà chaude, jamais dans l'eau froide.",
+          steps: [
+            "Sortez l'œuf du réfrigérateur 15 min avant : un œuf trop froid choque au contact de l'eau chaude et la coquille se fissure.",
+            "Portez une casserole d'eau à frémissement (petits bouillons, pas un plein bouillon) et ajoutez une pincée de sel : si la coquille se fend, le sel aide le blanc à coaguler plutôt qu'à s'échapper.",
+            "Plongez délicatement l'œuf à la cuillère et démarrez le minuteur à cet instant précis.",
+            "Égouttez et servez aussitôt dans un coquetier, avec des mouillettes de pain beurré."
+          ]
+        }
       },
       {
         id: "mollet-doux",
@@ -889,7 +1154,16 @@
         desc: "Blanc pris, jaune très coulant.",
         time: 360,
         science: "À 6 minutes, le blanc a coagulé jusqu’au centre. La chaleur commence tout juste à atteindre la périphérie du jaune, qui épaissit légèrement en surface tout en restant très coulant au cœur.",
-        tip: "Parfait écalé sur une salade tiède ou une tartine, pour un jaune qui s’écoule."
+        tip: "Parfait écalé sur une salade tiède ou une tartine, pour un jaune qui s’écoule.",
+        recipe: {
+          intro: "Même principe que l'œuf à la coque, avec un passage sous l'eau froide qui facilite l'écalage.",
+          steps: [
+            "Œuf à température ambiante, eau frémissante (pas un plein bouillon, pour éviter que l'œuf ne cogne contre la casserole et se fissure).",
+            "Plongez l'œuf délicatement et démarrez le minuteur.",
+            "Dès la sonnerie, passez l'œuf sous l'eau froide 30 secondes pour stopper net la cuisson.",
+            "Écalez avec précaution en tapotant toute la coquille : le jaune est encore très coulant sous une fine couche de blanc pris."
+          ]
+        }
       },
       {
         id: "mollet",
@@ -897,7 +1171,16 @@
         desc: "Jaune crémeux, blanc bien tenu.",
         time: 420,
         science: "Une minute de plus suffit à faire progresser la chaleur plus profondément dans le jaune : une bonne partie de sa masse dépasse 65 °C et prend une texture crémeuse, presque pâteuse, sans devenir sèche.",
-        tip: "Idéal sur un bol de riz, un ramen, ou coupé en deux sur des légumes rôtis."
+        tip: "Idéal sur un bol de riz, un ramen, ou coupé en deux sur des légumes rôtis.",
+        recipe: {
+          intro: "Une astuce italienne classique : une touche de vinaigre dans l'eau resserre le blanc pour une texture plus nette.",
+          steps: [
+            "Œuf à température ambiante. Portez l'eau à peine frémissante et ajoutez une cuillère à café de vinaigre blanc.",
+            "Le vinaigre fait coaguler le blanc plus rapidement si la coquille venait à se fissurer, et affine légèrement sa texture.",
+            "Plongez l'œuf et démarrez le minuteur dès l'immersion.",
+            "À la sonnerie, plongez-le 30 secondes dans l'eau froide avant de l'écaler : le jaune reste crémeux, le blanc est bien pris."
+          ]
+        }
       },
       {
         id: "dur",
@@ -905,7 +1188,16 @@
         desc: "Cuisson complète, texture ferme.",
         time: 600,
         science: "Après 10 minutes, le jaune a dépassé 70 °C sur toute son épaisseur : la coagulation est complète et homogène, donnant une texture ferme et friable, du bord jusqu’au centre.",
-        tip: "Le choix classique pour les œufs mimosa, les salades composées et les sandwichs."
+        tip: "Le choix classique pour les œufs mimosa, les salades composées et les sandwichs.",
+        recipe: {
+          intro: "La méthode italienne des « uova sode » : on part cette fois à froid, contrairement aux cuissons courtes.",
+          steps: [
+            "Placez l'œuf directement dans une casserole d'eau froide (contrairement aux autres cuissons) : ce départ à froid évite le choc thermique sur une longue cuisson et limite les fissures.",
+            "Portez doucement à ébullition, puis démarrez le minuteur dès que l'eau frémit franchement.",
+            "Laissez cuire à frémissement doux, sans bouillon violent, pour éviter que les œufs ne s'entrechoquent.",
+            "Dès la sonnerie, plongez immédiatement les œufs dans un bol d'eau glacée : arrêt net de la cuisson, écalage facilité, et le jaune garde une belle couleur sans cerne grisâtre."
+          ]
+        }
       }
     ].sort((a, b) => a.time - b.time);
 
@@ -942,7 +1234,6 @@
     const mainView = document.querySelector(".app > main");
     const sciencePage = document.getElementById("sciencePage");
     const scienceList = document.getElementById("scienceList");
-    const alertBanner = document.getElementById("alertBanner");
     const alertBannerText = document.getElementById("alertBannerText");
     const enableAlertsBtn = document.getElementById("enableAlertsBtn");
     const tickToggle = document.getElementById("tickToggle");
@@ -971,41 +1262,50 @@
       const ctx = ensureAudioContext();
       if (!ctx) return;
       const startAt = ctx.currentTime + 0.03;
-      const ringTimes = [0, 0.55, 1.1, 1.65, 2.2];
+      const ringTimes = [0, 0.55, 1.1, 1.65, 2.2]; // une "sonnerie"
+      const repeatEvery = 3.2; // secondes entre le début de chaque répétition
+      const repeats = 3;
 
-      ringTimes.forEach((offset) => {
-        const t = startAt + offset;
-        [880, 1108.73].forEach((freq, i) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(freq, t);
-          gain.gain.setValueAtTime(0, t);
-          gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
-          osc.connect(gain).connect(ctx.destination);
-          osc.start(t + i * 0.05);
-          osc.stop(t + 0.5);
+      for (let rep = 0; rep < repeats; rep++) {
+        ringTimes.forEach((offset) => {
+          const t = startAt + rep * repeatEvery + offset;
+          [880, 1108.73].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(t + i * 0.05);
+            osc.stop(t + 0.5);
+          });
         });
-      });
+      }
     }
 
-    // Petit "tic" sec et discret, joué à chaque seconde pendant la cuisson.
+    // Petit "tic-tac" d'horloge, alterné à chaque seconde (tic aigu, toc plus
+    // grave) pendant la cuisson. Ne dépend que du contexte audio (débloqué
+    // dès le clic sur "Démarrer"), pas du bouton "Activer les alertes".
+    let tickIsHigh = true;
     function playTick() {
       if (!tickToggle.checked) return;
       const ctx = ensureAudioContext();
-      if (!ctx || !alertsPrimed) return; // pas de son tant que l'audio n'est pas débloqué
+      if (!ctx) return;
       const t = ctx.currentTime + 0.01;
+      const freq = tickIsHigh ? 1350 : 950;
+      tickIsHigh = !tickIsHigh;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "square";
-      osc.frequency.setValueAtTime(1500, t);
+      osc.type = "triangle"; // plus doux qu'une onde carrée, moins "explosif"
+      osc.frequency.setValueAtTime(freq, t);
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.05, t + 0.004);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+      gain.gain.linearRampToValueAtTime(0.05, t + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.025);
       osc.connect(gain).connect(ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.05);
+      osc.stop(t + 0.03);
     }
 
     function vibrateDevice() {
@@ -1029,7 +1329,7 @@
         } else {
           new Notification("Minuteur terminé", { body, icon: "icon-192.png" });
         }
-      } catch (e) {
+      } catch {
         // Certains contextes (ex. Safari sans PWA installée) refusent silencieusement.
       }
     }
@@ -1045,15 +1345,15 @@
       const granted = hasNotif && Notification.permission === "granted";
 
       if (alertsPrimed && (granted || !hasNotif)) {
-        alertBanner.classList.add("ok");
+        alertBannerText.classList.add("ok");
         alertBannerText.textContent = "Alertes activées : son, vibration (si disponible) et notification.";
         enableAlertsBtn.style.display = "none";
       } else if (hasNotif && Notification.permission === "denied") {
-        alertBanner.classList.remove("ok");
+        alertBannerText.classList.remove("ok");
         alertBannerText.textContent = "Notifications bloquées. Le son sonnera quand même si l'app est ouverte.";
         enableAlertsBtn.style.display = "none";
       } else {
-        alertBanner.classList.remove("ok");
+        alertBannerText.classList.remove("ok");
         alertBannerText.textContent = "Activez le son et les notifications pour ne pas manquer la fin de cuisson.";
         enableAlertsBtn.style.display = "";
       }
@@ -1131,7 +1431,7 @@
           album: "L’œuf — Minuteur"
         });
         navigator.mediaSession.playbackState = running ? "playing" : (paused ? "paused" : "none");
-      } catch (e) {
+      } catch {
         // Certains navigateurs refusent MediaMetadata hors contexte utilisateur ; on ignore.
       }
     }
@@ -1142,19 +1442,45 @@
         navigator.mediaSession.setActionHandler("play", startTimer);
         navigator.mediaSession.setActionHandler("pause", pauseTimer);
         navigator.mediaSession.setActionHandler("stop", resetTimer);
-      } catch (e) {}
+      } catch {}
     }
 
     function startKeepAliveAudio() {
-      // Lance une piste silencieuse en boucle : sur Android en particulier,
-      // cela évite que le système ne coupe la session média (et donc les
-      // contrôles sur écran verrouillé) dès que l'app passe en arrière-plan.
+      // Une piste (quasi) silencieuse jouée en boucle pendant la cuisson.
+      // Sur mobile, une page qui joue activement de l'audio est traitée par
+      // l'OS comme une activité légitime en arrière-plan : c'est ce qui
+      // permet au minuteur de continuer à décompter (et de sonner) même si
+      // vous changez d'app ou verrouillez l'écran — au lieu d'être simplement
+      // gelé. Le comportement exact dépend du navigateur et de la version
+      // d'OS, mais c'est la meilleure approche possible en web/PWA.
       keepAliveAudio.currentTime = 0;
       keepAliveAudio.play().catch(() => {});
+      requestWakeLock();
     }
 
     function stopKeepAliveAudio() {
       keepAliveAudio.pause();
+      releaseWakeLock();
+    }
+
+    // Empêche l'écran de s'éteindre tant que la cuisson est en cours (utile
+    // quand le téléphone reste posé, visible, à côté de vous). Se libère
+    // automatiquement dès que l'onglet passe en arrière-plan ; on le
+    // redemande donc au retour au premier plan (cf. visibilitychange).
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+      if (!("wakeLock" in navigator)) return;
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+      } catch {}
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        wakeLock.release().catch(() => {});
+        wakeLock = null;
+      }
     }
 
     function renderScience() {
@@ -1173,6 +1499,7 @@
               <p>${m.science}</p>
               <p class="science-tip"><strong>À table :</strong> ${m.tip}</p>
             </div>
+            <button type="button" class="recipe-btn" data-mode-id="${m.id}">Voir la recette</button>
           </div>
         `;
         scienceList.appendChild(card);
@@ -1269,6 +1596,7 @@
       paused = false;
       running = true;
       endTime = Date.now() + remaining * 1000;
+      tickIsHigh = true;
       startBtn.textContent = "En cuisson";
       startBtn.disabled = true;
       pauseBtn.disabled = false;
@@ -1327,6 +1655,7 @@
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && running) {
         tick();
+        requestWakeLock();
       }
     });
     window.addEventListener("focus", () => {
@@ -1350,6 +1679,133 @@
         closeModal();
       }
     });
+
+    // ---------- Panneau de réglages ----------
+    const navSettings = document.getElementById("navSettings");
+    const settingsOverlay = document.getElementById("settingsOverlay");
+    const settingsClose = document.getElementById("settingsClose");
+    const themeSwitch = document.getElementById("themeSwitch");
+
+    function openSettings() {
+      settingsOverlay.classList.add("open");
+      settingsOverlay.setAttribute("aria-hidden", "false");
+      settingsClose.focus();
+    }
+
+    function closeSettings() {
+      settingsOverlay.classList.remove("open");
+      settingsOverlay.setAttribute("aria-hidden", "true");
+      navSettings.focus();
+    }
+
+    navSettings.addEventListener("click", openSettings);
+    settingsClose.addEventListener("click", closeSettings);
+    settingsOverlay.addEventListener("click", (e) => {
+      if (e.target === settingsOverlay) closeSettings();
+    });
+
+    // ---------- Modale "recette" (mode Recherche) ----------
+    const recipeOverlay = document.getElementById("recipeOverlay");
+    const recipeClose = document.getElementById("recipeClose");
+    const recipeTitle = document.getElementById("recipeTitle");
+    const recipeBody = document.getElementById("recipeBody");
+
+    function openRecipe(mode) {
+      recipeTitle.textContent = mode.name;
+      recipeBody.innerHTML = `
+        <p class="recipe-intro">${mode.recipe.intro}</p>
+        <ol class="recipe-steps">
+          ${mode.recipe.steps.map((s) => `<li>${s}</li>`).join("")}
+        </ol>
+        <button type="button" class="settings-btn" id="recipeStartBtn">
+          Lancer le minuteur — ${Math.floor(mode.time / 60)} min${mode.time % 60 ? ` ${mode.time % 60} s` : ""}
+        </button>
+      `;
+      document.getElementById("recipeStartBtn").addEventListener("click", () => {
+        selectMode(mode);
+        closeRecipe();
+        showTimer();
+      });
+      recipeOverlay.classList.add("open");
+      recipeOverlay.setAttribute("aria-hidden", "false");
+      recipeClose.focus();
+    }
+
+    function closeRecipe() {
+      recipeOverlay.classList.remove("open");
+      recipeOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    // Délégation d'événement : les boutons "Voir la recette" sont recréés
+    // à chaque renderScience(), donc on écoute sur le conteneur parent.
+    scienceList.addEventListener("click", (e) => {
+      const btn = e.target.closest(".recipe-btn");
+      if (!btn) return;
+      const mode = modes.find((m) => m.id === btn.dataset.modeId);
+      if (mode) openRecipe(mode);
+    });
+
+    recipeClose.addEventListener("click", closeRecipe);
+    recipeOverlay.addEventListener("click", (e) => {
+      if (e.target === recipeOverlay) closeRecipe();
+    });
+
+    // ---------- Thème clair / sombre / auto ----------
+    // Le choix est mémorisé (localStorage) pour être retrouvé au prochain
+    // lancement, une fois l'app hébergée et installée sur votre téléphone.
+    const THEME_KEY = "oeuf-theme";
+    const systemDarkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+    function getStoredTheme() {
+      try {
+        return localStorage.getItem(THEME_KEY) || "system";
+      } catch {
+        return "system";
+      }
+    }
+
+    function storeTheme(value) {
+      try {
+        localStorage.setItem(THEME_KEY, value);
+      } catch {
+        // Stockage indisponible (ex. navigation privée) : le choix ne sera
+        // pas mémorisé au prochain lancement, mais tout reste fonctionnel.
+      }
+    }
+
+    function applyTheme(choice) {
+      const resolved = choice === "system"
+        ? (systemDarkQuery && systemDarkQuery.matches ? "dark" : "light")
+        : choice;
+      document.documentElement.setAttribute("data-theme", resolved);
+      document.querySelector('meta[name="theme-color"]').setAttribute(
+        "content",
+        resolved === "dark" ? "#1c1c1e" : "#fbfbfd"
+      );
+      [...themeSwitch.children].forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.themeChoice === choice);
+      });
+    }
+
+    function setTheme(choice) {
+      storeTheme(choice);
+      applyTheme(choice);
+    }
+
+    themeSwitch.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-theme-choice]");
+      if (!btn) return;
+      setTheme(btn.dataset.themeChoice);
+    });
+
+    if (systemDarkQuery) {
+      systemDarkQuery.addEventListener("change", () => {
+        if (getStoredTheme() === "system") applyTheme("system");
+      });
+    }
+
+    // Applique le thème mémorisé dès le chargement.
+    applyTheme(getStoredTheme());
   </script>
 </body>
 </html>
