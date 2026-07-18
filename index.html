@@ -1106,8 +1106,17 @@
 
           <div class="settings-section">
             <h3>Alertes de fin de cuisson</h3>
-            <p class="alert-status" id="alertBannerText">Activez le son et les notifications pour ne pas manquer la fin de cuisson.</p>
-            <button type="button" class="settings-btn" id="enableAlertsBtn">Activer les alertes</button>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Notifications</div>
+                <div class="settings-row-desc">Recevez une notification lorsque le minuteur se termine.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="alertsToggle" checked aria-label="Activer les notifications de fin de cuisson" />
+                <span class="switch-track"></span>
+              </label>
+            </div>
+            <p class="alert-status" id="alertBannerText"></p>
           </div>
 
           <div class="settings-section">
@@ -1267,7 +1276,7 @@
     const sciencePage = getRequiredElement("sciencePage");
     const scienceList = getRequiredElement("scienceList");
     const alertBannerText = getRequiredElement("alertBannerText");
-    const enableAlertsBtn = getRequiredElement("enableAlertsBtn");
+    const alertsToggle = /** @type {HTMLInputElement} */ (getRequiredElement("alertsToggle"));
     const tickToggle = /** @type {HTMLInputElement} */ (getRequiredElement("tickToggle"));
     const keepAliveAudio = /** @type {HTMLAudioElement} */ (getRequiredElement("keepAliveAudio"));
     const themeColorMeta = /** @type {HTMLMetaElement} */ (getRequiredSelector('meta[name="theme-color"]'));
@@ -1277,7 +1286,27 @@
 
     // ---------- Alertes de fin de minuteur (son, vibration, notification) ----------
     let audioCtx = null;
-    let alertsPrimed = false; // le contexte audio a été débloqué par un geste utilisateur
+    const ALERTS_ENABLED_KEY = "oeuf-alert-notifications-enabled";
+
+    // Les notifications sont activées par défaut. Le choix de désactivation est
+    // conservé pour les prochains lancements de l'application.
+    function getAlertsEnabled() {
+      try {
+        return localStorage.getItem(ALERTS_ENABLED_KEY) !== "false";
+      } catch {
+        return true;
+      }
+    }
+
+    function setAlertsEnabled(enabled) {
+      try {
+        localStorage.setItem(ALERTS_ENABLED_KEY, String(enabled));
+      } catch {
+        // Stockage indisponible : le réglage reste appliqué pour cette session.
+      }
+    }
+
+    alertsToggle.checked = getAlertsEnabled();
 
     function ensureAudioContext() {
       if (!audioCtx) {
@@ -1422,6 +1451,7 @@
     }
 
     async function notifyDone() {
+      if (!alertsToggle.checked) return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
       const body = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
@@ -1464,36 +1494,35 @@
       const hasNotif = "Notification" in window;
       const granted = hasNotif && Notification.permission === "granted";
 
-      if (alertsPrimed && (granted || !hasNotif)) {
+      if (!alertsToggle.checked) {
+        alertBannerText.classList.remove("ok");
+        alertBannerText.textContent = "Notifications désactivées. La sonnerie de fin de cuisson reste active.";
+      } else if (granted) {
         alertBannerText.classList.add("ok");
-        alertBannerText.textContent = "Alertes activées : son, vibration (si disponible) et notification.";
-        enableAlertsBtn.style.display = "none";
+        alertBannerText.textContent = "Notifications activées : vous serez prévenu à la fin de la cuisson.";
       } else if (hasNotif && Notification.permission === "denied") {
         alertBannerText.classList.remove("ok");
-        alertBannerText.textContent = "Notifications bloquées. Le son sonnera quand même si l'app est ouverte.";
-        enableAlertsBtn.style.display = "none";
-      } else {
+        alertBannerText.textContent = "Notifications bloquées par le navigateur. La sonnerie restera active.";
+      } else if (!hasNotif) {
         alertBannerText.classList.remove("ok");
-        alertBannerText.textContent = "Activez le son et les notifications pour ne pas manquer la fin de cuisson.";
-        enableAlertsBtn.style.display = "";
+        alertBannerText.textContent = "Les notifications ne sont pas prises en charge par ce navigateur.";
+      } else {
+        alertBannerText.classList.add("ok");
+        alertBannerText.textContent = "Notifications activées. Le navigateur demandera votre autorisation au démarrage du minuteur.";
       }
     }
 
-    enableAlertsBtn.addEventListener("click", () => {
-      // Doit être déclenché par un geste utilisateur pour débloquer l'audio sur iOS.
-      ensureAudioContext();
-      alertsPrimed = true;
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission().then(updateAlertBanner);
-      } else {
-        updateAlertBanner();
-      }
+    alertsToggle.addEventListener("change", () => {
+      setAlertsEnabled(alertsToggle.checked);
+      updateAlertBanner();
     });
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("sw.js").then(updateAlertBanner).catch(updateAlertBanner);
       });
+    } else {
+      updateAlertBanner();
     }
 
     function formatTime(s) {
@@ -1719,7 +1748,7 @@
       ensureAudioContext();
       // La demande est faite depuis le clic sur « Démarrer », seul contexte
       // accepté par Safari et la plupart des navigateurs mobiles.
-      if ("Notification" in window && Notification.permission === "default") {
+      if (alertsToggle.checked && "Notification" in window && Notification.permission === "default") {
         Notification.requestPermission().then(updateAlertBanner);
       }
       paused = false;
