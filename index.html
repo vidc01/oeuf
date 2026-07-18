@@ -1421,21 +1421,34 @@
       }
     }
 
-    function notifyDone() {
+    async function notifyDone() {
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
+      const body = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+      const options = {
+        body,
+        icon: "images/oeuf.png",
+        badge: "images/oeuf.png",
+        tag: "oeuf-timer-done",
+        renotify: true,
+        requireInteraction: true
+      };
       try {
-        const reg = navigator.serviceWorker && navigator.serviceWorker.controller
-          ? navigator.serviceWorker
-          : null;
-        const body = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
-        if (reg && reg.ready) {
-          reg.ready.then((r) => r.showNotification("Minuteur terminé", { body, icon: "icon-192.png" }));
+        // Sur les téléphones, une notification doit être affichée par le
+        // service worker. L'ancien test regardait seulement "controller",
+        // ce qui échouait au premier lancement et faisait perdre l'alerte.
+        if ("serviceWorker" in navigator) {
+          const registration = await navigator.serviceWorker.ready;
+          await registration.showNotification("Minuteur terminé", options);
         } else {
-          new Notification("Minuteur terminé", { body, icon: "icon-192.png" });
+          new Notification("Minuteur terminé", options);
         }
       } catch {
-        // Certains contextes (ex. Safari sans PWA installée) refusent silencieusement.
+        // Fallback utile dans les navigateurs qui autorisent les notifications
+        // de page mais ne prennent pas en charge showNotification().
+        try {
+          new Notification("Minuteur terminé", options);
+        } catch {}
       }
     }
 
@@ -1479,7 +1492,7 @@
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+        navigator.serviceWorker.register("sw.js").then(updateAlertBanner).catch(updateAlertBanner);
       });
     }
 
@@ -1704,6 +1717,11 @@
       if (running) return;
 
       ensureAudioContext();
+      // La demande est faite depuis le clic sur « Démarrer », seul contexte
+      // accepté par Safari et la plupart des navigateurs mobiles.
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().then(updateAlertBanner);
+      }
       paused = false;
       running = true;
       endTime = Date.now() + remaining * 1000;
