@@ -1234,6 +1234,9 @@
     let interval = null;
     let running = false;
     let paused = false;
+    // Une fin peut être observée par plusieurs événements (intervalle,
+    // retour au premier plan, focus). Une seule alerte doit partir par cuisson.
+    let endAlertSent = false;
 
     // ---------- Horodatage : le minuteur se recale toujours sur l'heure réelle ----------
     // Au lieu de compter "remaining -= 1" à chaque tick (ce qui dérive ou se fige
@@ -1432,6 +1435,8 @@
     // Regénère et joue la piste "silence + sonnerie" pour le temps restant
     // actuel. Appelée à chaque démarrage/reprise du minuteur, afin que la
     // sonnerie tombe toujours au bon moment même après une pause.
+    let alarmTrackIsPlaying = false;
+
     function loadAlarmTrack(remainingSeconds) {
       const blob = buildAlarmTrack(remainingSeconds);
       if (alarmTrackUrl) URL.revokeObjectURL(alarmTrackUrl);
@@ -1439,7 +1444,10 @@
       keepAliveAudio.loop = false;
       keepAliveAudio.src = alarmTrackUrl;
       keepAliveAudio.currentTime = 0;
-      keepAliveAudio.play().catch(() => {});
+      alarmTrackIsPlaying = false;
+      keepAliveAudio.play().then(() => {
+        alarmTrackIsPlaying = true;
+      }).catch(() => {});
     }
 
     function vibrateDevice() {
@@ -1450,11 +1458,11 @@
       }
     }
 
-    async function notifyDone() {
+    async function notifyDone(mode) {
       if (!alertsToggle.checked) return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
-      const body = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+      const body = `Votre œuf ${mode.name.toLowerCase()} est prêt.`;
       const options = {
         body,
         icon: "images/oeuf.png",
@@ -1482,12 +1490,38 @@
       }
     }
 
-    function fireEndAlerts() {
+    function playAlarmFallback() {
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+      const start = ctx.currentTime + 0.01;
+      [0, 0.55, 1.1].forEach((offset) => {
+        [880, 1108.73].forEach((frequency, index) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const toneStart = start + offset + index * 0.05;
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(frequency, toneStart);
+          gain.gain.setValueAtTime(0, toneStart);
+          gain.gain.linearRampToValueAtTime(0.2, toneStart + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, toneStart + 0.42);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(toneStart);
+          osc.stop(toneStart + 0.45);
+        });
+      });
+    }
+
+    function fireEndAlerts(mode) {
+      if (endAlertSent) return;
+      endAlertSent = true;
       // La sonnerie n'est plus déclenchée ici : elle est déjà encodée dans la
       // piste audio jouée depuis startKeepAliveAudio(), et se joue donc au bon
       // moment même si l'app est en arrière-plan / l'écran verrouillé.
+      // Si le navigateur a refusé la lecture de cette piste, on conserve une
+      // sonnerie de secours pour que tous les modes alertent aussi au premier plan.
+      if (!alarmTrackIsPlaying) playAlarmFallback();
       vibrateDevice();
-      notifyDone();
+      notifyDone(mode);
     }
 
     function updateAlertBanner() {
@@ -1613,6 +1647,7 @@
 
     function stopKeepAliveAudio() {
       keepAliveAudio.pause();
+      alarmTrackIsPlaying = false;
       if (alarmTrackUrl) {
         URL.revokeObjectURL(alarmTrackUrl);
         alarmTrackUrl = null;
@@ -1698,6 +1733,7 @@
       running = false;
       paused = false;
       endTime = null;
+      endAlertSent = false;
       stopKeepAliveAudio();
       currentMode = m;
       remaining = m.time;
@@ -1720,7 +1756,9 @@
       if (!running || endTime === null) return;
       const previousRemaining = remaining;
       const msLeft = endTime - Date.now();
-      remaining = Math.max(0, Math.round(msLeft / 1000));
+      // ceil évite d'afficher 00:00 avant l'échéance réelle : la sonnerie,
+      // la notification et l'affichage basculent tous au même instant.
+      remaining = Math.max(0, Math.ceil(msLeft / 1000));
 
       if (remaining !== previousRemaining) {
         updateDisplay();
@@ -1728,6 +1766,7 @@
       }
 
       if (msLeft <= 0) {
+        const completedMode = currentMode;
         clearInterval(interval);
         interval = null;
         running = false;
@@ -1736,14 +1775,14 @@
         startBtn.textContent = "Démarrer";
         startBtn.disabled = false;
         pauseBtn.disabled = true;
-        statusLine.textContent = `Votre œuf ${currentMode.name.toLowerCase()} est prêt.`;
+        statusLine.textContent = `Votre œuf ${completedMode.name.toLowerCase()} est prêt.`;
         statusLine.classList.add("done");
         remaining = 0;
         updateDisplay();
         // On ne coupe plus la piste audio ici : elle contient la sonnerie et
         // doit pouvoir finir de se jouer jusqu'au bout, y compris si le
         // minuteur se termine pendant que l'app est en arrière-plan.
-        fireEndAlerts();
+        fireEndAlerts(completedMode);
       }
     }
 
@@ -1759,6 +1798,7 @@
       }
       paused = false;
       running = true;
+      endAlertSent = false;
       endTime = Date.now() + remaining * 1000;
       tickIsHigh = true;
       startBtn.textContent = "En cuisson";
@@ -1779,6 +1819,8 @@
 
     function pauseTimer() {
       if (!running) return;
+      // Conserver le temps exact au moment de la pause, même entre deux ticks.
+      remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
       clearInterval(interval);
       interval = null;
       running = false;
@@ -1799,6 +1841,7 @@
       running = false;
       paused = false;
       endTime = null;
+      endAlertSent = false;
       remaining = currentMode.time;
       total = currentMode.time;
       statusLine.textContent = "";
