@@ -532,7 +532,8 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:7px;
+      flex-wrap:wrap;
+      gap:18px;
       padding:16px 20px 22px;
       font-size:11.5px;
       color:var(--accent);
@@ -548,6 +549,16 @@
       background:var(--accent);
       display:inline-block;
       flex:0 0 auto;
+    }
+
+    .footer-tagline {
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+    }
+
+    .app-footer p {
+      margin:0;
     }
 
     .modal-overlay {
@@ -1049,7 +1060,11 @@
     </section>
 
     <footer class="app-footer">
-      <span class="dot"></span>Fait avec précision, à la seconde près.
+      <span class="footer-tagline">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Fait avec précision, à la seconde près.</span>
+      </span>
+      <p>© Victor Daucourt — Tous droits réservés</p>
     </footer>
   </div>
 
@@ -1217,27 +1232,42 @@
     // de fin — se corrigent immédiatement au lieu de rester bloqués.
     let endTime = null; // timestamp (ms) auquel le minuteur doit sonner
 
-    const modeGrid = document.getElementById("modeGrid");
-    const timeDisplay = document.getElementById("timeDisplay");
-    const timeLabel = document.getElementById("timeLabel");
-    const ringFg = document.getElementById("ringFg");
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const statusLine = document.getElementById("statusLine");
-    const mtName = document.getElementById("mtName");
-    const openModalBtn = document.getElementById("openModalBtn");
-    const modalOverlay = document.getElementById("modalOverlay");
-    const modalClose = document.getElementById("modalClose");
-    const navModes = document.getElementById("navModes");
-    const navTimer = document.getElementById("navTimer");
-    const mainView = document.querySelector(".app > main");
-    const sciencePage = document.getElementById("sciencePage");
-    const scienceList = document.getElementById("scienceList");
-    const alertBannerText = document.getElementById("alertBannerText");
-    const enableAlertsBtn = document.getElementById("enableAlertsBtn");
-    const tickToggle = document.getElementById("tickToggle");
-    const keepAliveAudio = document.getElementById("keepAliveAudio");
+    // Centralise les accès au DOM : une modification du HTML échoue avec un
+    // message explicite, plutôt qu'avec une erreur « null » plus loin.
+    function getRequiredElement(id) {
+      const element = document.getElementById(id);
+      if (!element) throw new Error(`Élément introuvable : #${id}`);
+      return element;
+    }
+
+    function getRequiredSelector(selector) {
+      const element = document.querySelector(selector);
+      if (!element) throw new Error(`Élément introuvable : ${selector}`);
+      return element;
+    }
+
+    const modeGrid = getRequiredElement("modeGrid");
+    const timeDisplay = getRequiredElement("timeDisplay");
+    const timeLabel = getRequiredElement("timeLabel");
+    const ringFg = /** @type {SVGCircleElement} */ (getRequiredElement("ringFg"));
+    const startBtn = getRequiredElement("startBtn");
+    const pauseBtn = getRequiredElement("pauseBtn");
+    const resetBtn = getRequiredElement("resetBtn");
+    const statusLine = getRequiredElement("statusLine");
+    const mtName = getRequiredElement("mtName");
+    const openModalBtn = getRequiredElement("openModalBtn");
+    const modalOverlay = getRequiredElement("modalOverlay");
+    const modalClose = getRequiredElement("modalClose");
+    const navModes = getRequiredElement("navModes");
+    const navTimer = getRequiredElement("navTimer");
+    const mainView = /** @type {HTMLElement} */ (getRequiredSelector(".app > main"));
+    const sciencePage = getRequiredElement("sciencePage");
+    const scienceList = getRequiredElement("scienceList");
+    const alertBannerText = getRequiredElement("alertBannerText");
+    const enableAlertsBtn = getRequiredElement("enableAlertsBtn");
+    const tickToggle = /** @type {HTMLInputElement} */ (getRequiredElement("tickToggle"));
+    const keepAliveAudio = /** @type {HTMLAudioElement} */ (getRequiredElement("keepAliveAudio"));
+    const themeColorMeta = /** @type {HTMLMetaElement} */ (getRequiredSelector('meta[name="theme-color"]'));
     const CIRC = 2 * Math.PI * 92;
 
     ringFg.setAttribute("stroke-dasharray", CIRC);
@@ -1681,10 +1711,10 @@
     });
 
     // ---------- Panneau de réglages ----------
-    const navSettings = document.getElementById("navSettings");
-    const settingsOverlay = document.getElementById("settingsOverlay");
-    const settingsClose = document.getElementById("settingsClose");
-    const themeSwitch = document.getElementById("themeSwitch");
+    const navSettings = getRequiredElement("navSettings");
+    const settingsOverlay = getRequiredElement("settingsOverlay");
+    const settingsClose = getRequiredElement("settingsClose");
+    const themeSwitch = getRequiredElement("themeSwitch");
 
     function openSettings() {
       settingsOverlay.classList.add("open");
@@ -1705,10 +1735,10 @@
     });
 
     // ---------- Modale "recette" (mode Recherche) ----------
-    const recipeOverlay = document.getElementById("recipeOverlay");
-    const recipeClose = document.getElementById("recipeClose");
-    const recipeTitle = document.getElementById("recipeTitle");
-    const recipeBody = document.getElementById("recipeBody");
+    const recipeOverlay = getRequiredElement("recipeOverlay");
+    const recipeClose = getRequiredElement("recipeClose");
+    const recipeTitle = getRequiredElement("recipeTitle");
+    const recipeBody = getRequiredElement("recipeBody");
 
     function openRecipe(mode) {
       recipeTitle.textContent = mode.name;
@@ -1721,7 +1751,9 @@
           Lancer le minuteur — ${Math.floor(mode.time / 60)} min${mode.time % 60 ? ` ${mode.time % 60} s` : ""}
         </button>
       `;
-      document.getElementById("recipeStartBtn").addEventListener("click", () => {
+      const recipeStartBtn = recipeBody.querySelector("#recipeStartBtn");
+      if (!recipeStartBtn) throw new Error("Bouton de démarrage de recette introuvable.");
+      recipeStartBtn.addEventListener("click", () => {
         selectMode(mode);
         closeRecipe();
         showTimer();
@@ -1739,8 +1771,9 @@
     // Délégation d'événement : les boutons "Voir la recette" sont recréés
     // à chaque renderScience(), donc on écoute sur le conteneur parent.
     scienceList.addEventListener("click", (e) => {
+      if (!(e.target instanceof Element)) return;
       const btn = e.target.closest(".recipe-btn");
-      if (!btn) return;
+      if (!(btn instanceof HTMLButtonElement)) return;
       const mode = modes.find((m) => m.id === btn.dataset.modeId);
       if (mode) openRecipe(mode);
     });
@@ -1753,17 +1786,23 @@
     // ---------- Thème clair / sombre / auto ----------
     // Le choix est mémorisé (localStorage) pour être retrouvé au prochain
     // lancement, une fois l'app hébergée et installée sur votre téléphone.
+    /** @typedef {"light" | "dark" | "system"} ThemeChoice */
     const THEME_KEY = "oeuf-theme";
     const systemDarkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
+    /** @returns {ThemeChoice} */
     function getStoredTheme() {
       try {
-        return localStorage.getItem(THEME_KEY) || "system";
+        const storedTheme = localStorage.getItem(THEME_KEY);
+        return storedTheme === "light" || storedTheme === "dark" || storedTheme === "system"
+          ? storedTheme
+          : "system";
       } catch {
         return "system";
       }
     }
 
+    /** @param {ThemeChoice} value */
     function storeTheme(value) {
       try {
         localStorage.setItem(THEME_KEY, value);
@@ -1773,29 +1812,36 @@
       }
     }
 
+    /** @param {ThemeChoice} choice */
     function applyTheme(choice) {
-      const resolved = choice === "system"
-        ? (systemDarkQuery && systemDarkQuery.matches ? "dark" : "light")
-        : choice;
-      document.documentElement.setAttribute("data-theme", resolved);
-      document.querySelector('meta[name="theme-color"]').setAttribute(
+      let resolved;
+      if (choice === "system") {
+        resolved = systemDarkQuery && systemDarkQuery.matches ? "dark" : "light";
+      } else {
+        resolved = choice;
+      }
+      document.documentElement.dataset.theme = resolved;
+      themeColorMeta.setAttribute(
         "content",
         resolved === "dark" ? "#1c1c1e" : "#fbfbfd"
       );
-      [...themeSwitch.children].forEach((btn) => {
+      themeSwitch.querySelectorAll("button[data-theme-choice]").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.themeChoice === choice);
       });
     }
 
+    /** @param {ThemeChoice} choice */
     function setTheme(choice) {
       storeTheme(choice);
       applyTheme(choice);
     }
 
     themeSwitch.addEventListener("click", (e) => {
+      if (!(e.target instanceof Element)) return;
       const btn = e.target.closest("button[data-theme-choice]");
-      if (!btn) return;
-      setTheme(btn.dataset.themeChoice);
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const choice = btn.dataset.themeChoice;
+      if (choice === "light" || choice === "dark" || choice === "system") setTheme(choice);
     });
 
     if (systemDarkQuery) {
